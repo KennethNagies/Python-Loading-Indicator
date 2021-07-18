@@ -41,7 +41,7 @@ class LoadingBar(LoadingIndicator):
     def get_header(self, terminal_width, loaded_percent):
         if (terminal_width < self.SPINNER_WIDTH + self.PERCENT_INDICATOR_WIDTH):
             return ""
-        spinner = f"[{self.SPINNER[self._current_spinner_index]}]"
+        spinner = f"({self.SPINNER[self._current_spinner_index]})"
         empty_space = ' ' * (terminal_width - self.SPINNER_WIDTH - self.PERCENT_INDICATOR_WIDTH)
         percent_text = f"{int(loaded_percent * 100):>3}%"
         minimum_width_with_title = self.SPINNER_WIDTH + self.PERCENT_INDICATOR_WIDTH + (2 * self.TITLE_PADDING) + len(self.TITLE_TRUNCATOR)
