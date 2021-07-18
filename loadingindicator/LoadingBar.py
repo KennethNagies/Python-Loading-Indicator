@@ -14,10 +14,12 @@ class LoadingBar(LoadingIndicator):
         self._current_progress = 0
         self._printed = False
         self._current_spinner_index = 0
+        self._last_printed_indicator = ""
 
     def draw(self):
         sys.stdout.write(str(self))
         sys.stdout.flush()
+        self._last_printed_indicator = str(self)
         self._current_spinner_index = (self._current_spinner_index + 1) % len(self.SPINNER)
 
     def set_progress(self, progress):
@@ -59,10 +61,12 @@ class LoadingBar(LoadingIndicator):
             loaded_percent = 0
         else:
             loaded_percent = self._current_progress / self._max_progress
+        indicator = ""
         if (self._printed):
-            indicator = "\033[F"
-        else:
-            indicator = ""
+            indicator += "\033[F"
+        prev_length = len(self._last_printed_indicator)
+        if (prev_length > 0 and self._last_printed_indicator[prev_length - 1] == os.linesep):
+            indicator += "\033[F"
         header = self.get_header(terminal_width, loaded_percent)
         bar = self.get_bar(terminal_width, loaded_percent)
         if (len(header) > 0):

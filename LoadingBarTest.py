@@ -7,6 +7,8 @@ def main():
         bar.set_progress(i)
         bar.draw()
         time.sleep(0.05)
+    bar.set_title("Done Testing!")
+    bar.draw()
 
 if __name__=="__main__":
     main()
