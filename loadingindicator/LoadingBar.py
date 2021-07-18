@@ -5,7 +5,7 @@ class LoadingBar(LoadingIndicator):
     SPINNER = ['|', '/', '-', '\\']
     TITLE_TRUNCATOR = "..."
     TITLE_PADDING = 3
-    SPINNER_WIDTH = 1
+    SPINNER_WIDTH = 3
     PERCENT_INDICATOR_WIDTH = 4
 
     def __init__(self, max_progress, title = ""):
@@ -41,7 +41,7 @@ class LoadingBar(LoadingIndicator):
     def get_header(self, terminal_width, loaded_percent):
         if (terminal_width < self.SPINNER_WIDTH + self.PERCENT_INDICATOR_WIDTH):
             return ""
-        spinner_char = self.SPINNER[self._current_spinner_index]
+        spinner = f"[{self.SPINNER[self._current_spinner_index]}]"
         empty_space = ' ' * (terminal_width - self.SPINNER_WIDTH - self.PERCENT_INDICATOR_WIDTH)
         percent_text = f"{int(loaded_percent * 100):>3}%"
         minimum_width_with_title = self.SPINNER_WIDTH + self.PERCENT_INDICATOR_WIDTH + (2 * self.TITLE_PADDING) + len(self.TITLE_TRUNCATOR)
@@ -52,8 +52,8 @@ class LoadingBar(LoadingIndicator):
             else:
                 title = self._title
             title_section_length = terminal_width - self.PERCENT_INDICATOR_WIDTH - self.SPINNER_WIDTH
-            return f"{spinner_char}{title:^{title_section_length}}{percent_text}"
-        return f"{spinner_char}{empty_space}{percent_text}"
+            return f"{spinner}{title:^{title_section_length}}{percent_text}"
+        return f"{spinner}{empty_space}{percent_text}"
 
     def __str__(self):
         terminal_width = os.get_terminal_size()[0]
