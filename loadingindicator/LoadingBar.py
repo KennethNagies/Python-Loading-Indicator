@@ -2,14 +2,17 @@ import os, sys
 from .LoadingIndicator import LoadingIndicator
 
 class LoadingBar(LoadingIndicator):
+    SPINNER = ['|', '/', '-', '\\']
     def __init__(self, max_progress):
         self._max_progress = max_progress
         self._current_progress = 0
         self._printed = False
+        self._current_spinner_index = 0
 
     def draw(self):
         sys.stdout.write(str(self))
         sys.stdout.flush()
+        self._current_spinner_index = (self._current_spinner_index + 1) % len(self.SPINNER)
 
     def set_progress(self, progress):
         self._current_progress = min(self._max_progress, progress)
@@ -25,9 +28,12 @@ class LoadingBar(LoadingIndicator):
         return f"[{'#' * filled_bar_length}{' ' * empty_bar_length}]"
 
     def get_header(self, terminal_width, loaded_percent):
-        if (terminal_width < 4):
+        if (terminal_width < 5):
             return ""
-        return f"{' ' * (terminal_width - 4)}{int(loaded_percent * 100):>3}%"
+        spinner_char = self.SPINNER[self._current_spinner_index]
+        empty_space = ' ' * (terminal_width - 5)
+        percent_text = f"{int(loaded_percent * 100):>3}%"
+        return f"{spinner_char}{empty_space}{percent_text}"
 
     def __str__(self):
         terminal_width = os.get_terminal_size()[0]
@@ -49,3 +55,4 @@ class LoadingBar(LoadingIndicator):
         if (loaded_percent == 1):
             indicator += os.linesep
         return indicator
+
