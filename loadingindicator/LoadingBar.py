@@ -3,8 +3,14 @@ from .LoadingIndicator import LoadingIndicator
 
 class LoadingBar(LoadingIndicator):
     SPINNER = ['|', '/', '-', '\\']
-    def __init__(self, max_progress):
+    TITLE_TRUNCATOR = "..."
+    TITLE_PADDING = 3
+    SPINNER_WIDTH = 1
+    PERCENT_INDICATOR_WIDTH = 4
+
+    def __init__(self, max_progress, title = ""):
         self._max_progress = max_progress
+        self._title = title
         self._current_progress = 0
         self._printed = False
         self._current_spinner_index = 0
@@ -17,6 +23,9 @@ class LoadingBar(LoadingIndicator):
     def set_progress(self, progress):
         self._current_progress = min(self._max_progress, progress)
 
+    def set_title(self, title):
+        self._title = title
+
     def get_bar(self, terminal_width, loaded_percent):
         bar_length = terminal_width - 2
         if (bar_length < 0):
@@ -28,11 +37,20 @@ class LoadingBar(LoadingIndicator):
         return f"[{'#' * filled_bar_length}{' ' * empty_bar_length}]"
 
     def get_header(self, terminal_width, loaded_percent):
-        if (terminal_width < 5):
+        if (terminal_width < self.SPINNER_WIDTH + self.PERCENT_INDICATOR_WIDTH):
             return ""
         spinner_char = self.SPINNER[self._current_spinner_index]
-        empty_space = ' ' * (terminal_width - 5)
+        empty_space = ' ' * (terminal_width - self.SPINNER_WIDTH - self.PERCENT_INDICATOR_WIDTH)
         percent_text = f"{int(loaded_percent * 100):>3}%"
+        minimum_width_with_title = self.SPINNER_WIDTH + self.PERCENT_INDICATOR_WIDTH + (2 * self.TITLE_PADDING) + len(self.TITLE_TRUNCATOR)
+        if (terminal_width >= minimum_width_with_title and len(self._title) > 0):
+            max_title_length = terminal_width - minimum_width_with_title
+            if (len(self._title) > max_title_length):
+                title = f"{self._title[0:max_title_length]}{self.TITLE_TRUNCATOR}"
+            else:
+                title = self._title
+            title_section_length = terminal_width - self.PERCENT_INDICATOR_WIDTH - self.SPINNER_WIDTH
+            return f"{spinner_char}{title:^{title_section_length}}{percent_text}"
         return f"{spinner_char}{empty_space}{percent_text}"
 
     def __str__(self):
