@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, time
 from .LoadingIndicator import LoadingIndicator
 
 class LoadingBar(LoadingIndicator):
@@ -7,6 +7,7 @@ class LoadingBar(LoadingIndicator):
     TITLE_PADDING = 3
     SPINNER_WIDTH = 3
     PERCENT_INDICATOR_WIDTH = 4
+    MIN_SPINNER_UPDATE_MS = 50
 
     def __init__(self, max_progress, title = ""):
         self._max_progress = max_progress
@@ -15,12 +16,16 @@ class LoadingBar(LoadingIndicator):
         self._printed = False
         self._current_spinner_index = 0
         self._last_printed_indicator = ""
+        self._last_spinner_drawn_ms = 0;
 
     def draw(self):
         sys.stdout.write(str(self))
         sys.stdout.flush()
         self._last_printed_indicator = str(self)
-        self._current_spinner_index = (self._current_spinner_index + 1) % len(self.SPINNER)
+        now_ms = time.time() * 1000
+        if (now_ms >= self._last_spinner_drawn_ms + self.MIN_SPINNER_UPDATE_MS):
+            self._current_spinner_index = (self._current_spinner_index + 1) % len(self.SPINNER)
+            self._last_spinner_drawn_ms = now_ms
 
     def set_progress(self, progress):
         self._current_progress = min(self._max_progress, progress)
